@@ -42,10 +42,24 @@ src/
    cp .env.example .env
    # Edit .env with your DATABASE_URL
    ```
-4. **Run migrations**
-   ```bash
-   bun run migrate:up
-   ```
+4. **Handle Database Migrations**
+   - **Local Development**: Apply all pending migrations to your local DB:
+     ```bash
+     bun run migrate:up
+     ```
+   - **Production**: migrations usually run as part of the deployment pipeline:
+     ```bash
+     # Ensure DATABASE_URL environment variable is set in your host
+     bun run migrate:up
+     ```
+   - **Undo a migration** (if you made a mistake localy):
+     ```bash
+     bun run migrate:down
+     ```
+   - **Create a new migration file**:
+     ```bash
+     bun run migrate create name_of_migration
+     ```
 5. **Start development server**
    ```bash
    bun run dev
