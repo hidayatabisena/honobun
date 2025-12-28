@@ -1,0 +1,7 @@
+[install]
+# Automatically install peer dependencies
+peer = true
+
+[test]
+# Enable coverage reporting
+coverage = true
