@@ -1,4 +1,4 @@
-import { NotFoundError } from '../../../core/errors/base/not-found-error';
+import { NotFoundError } from '@/core/errors/base/not-found-error';
 
 /**
  * Specific Order errors
@@ -6,6 +6,5 @@ import { NotFoundError } from '../../../core/errors/base/not-found-error';
 export class OrderNotFoundError extends NotFoundError {
     constructor(identifier: string | number) {
         super('Order', identifier);
-        this.name = 'OrderNotFoundError';
     }
 }
