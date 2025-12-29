@@ -14,12 +14,20 @@ export class ZodErrorHandler implements IErrorHandler {
 
     handle(error: unknown, c: Context): Response {
         const zodError = error as ZodError;
+
+        const details = zodError.errors.map((e) => ({
+            field: e.path.join('.'),
+            message: e.message,
+        }));
+
+        const messageFromContext = c.get('validationErrorMessage');
+        const message =
+            typeof messageFromContext === 'string'
+                ? messageFromContext
+                : 'Invalid request data';
+
         return c.json(
-            errorResponse(
-                'VALIDATION_ERROR',
-                'Invalid request data',
-                zodError.errors
-            ),
+            errorResponse('VALIDATION_ERROR', message, details),
             400
         );
     }

@@ -8,19 +8,18 @@ import { ValidationError } from '@/core/errors/base/validation-error';
  */
 export function validateBody<T>(schema: ZodSchema<T>) {
     return async (c: Context, next: Next) => {
-        const body = await c.req.json();
-        const result = schema.safeParse(body);
-
-        if (!result.success) {
-            const errors = result.error.errors.map((e) => ({
-                field: e.path.join('.'),
-                message: e.message,
-            }));
-            throw new ValidationError('Validation failed', errors);
+        let body: unknown;
+        try {
+            body = await c.req.json();
+        } catch {
+            throw new ValidationError('Invalid JSON body');
         }
 
+        c.set('validationErrorMessage', 'Validation failed');
+        const parsed = schema.parse(body);
+
         // Store validated data in context for later use
-        c.set('validatedBody', result.data);
+        c.set('validatedBody', parsed);
         await next();
     };
 }
@@ -31,17 +30,11 @@ export function validateBody<T>(schema: ZodSchema<T>) {
 export function validateQuery<T>(schema: ZodSchema<T>) {
     return async (c: Context, next: Next) => {
         const query = c.req.query();
-        const result = schema.safeParse(query);
 
-        if (!result.success) {
-            const errors = result.error.errors.map((e) => ({
-                field: e.path.join('.'),
-                message: e.message,
-            }));
-            throw new ValidationError('Invalid query parameters', errors);
-        }
+        c.set('validationErrorMessage', 'Invalid query parameters');
+        const parsed = schema.parse(query);
 
-        c.set('validatedQuery', result.data);
+        c.set('validatedQuery', parsed);
         await next();
     };
 }
@@ -52,17 +45,11 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
 export function validateParams<T>(schema: ZodSchema<T>) {
     return async (c: Context, next: Next) => {
         const params = c.req.param();
-        const result = schema.safeParse(params);
 
-        if (!result.success) {
-            const errors = result.error.errors.map((e) => ({
-                field: e.path.join('.'),
-                message: e.message,
-            }));
-            throw new ValidationError('Invalid path parameters', errors);
-        }
+        c.set('validationErrorMessage', 'Invalid path parameters');
+        const parsed = schema.parse(params);
 
-        c.set('validatedParams', result.data);
+        c.set('validatedParams', parsed);
         await next();
     };
 }
