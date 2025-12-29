@@ -1,6 +1,7 @@
-import { OrderRepository } from './order.repository';
-import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from './order.types';
-import { NotFoundError, ValidationError } from '@/modules/shared/types/error.types';
+import { OrderRepository } from '../repositories/order.repository';
+import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from '../types/order.types';
+import { ValidationError } from '../../../core/errors/base/validation-error';
+import { OrderNotFoundError } from '../errors/order-errors';
 
 /**
  * Order Service
@@ -13,7 +14,7 @@ export class OrderService {
         const order = await this.orderRepository.findById(id);
 
         if (!order) {
-            throw new NotFoundError('Order', id);
+            throw new OrderNotFoundError(id);
         }
 
         return order;
@@ -66,7 +67,7 @@ export class OrderService {
         const currentOrder = await this.orderRepository.findById(id);
 
         if (!currentOrder) {
-            throw new NotFoundError('Order', id);
+            throw new OrderNotFoundError(id);
         }
 
         // Business logic: Validate status transitions
@@ -89,7 +90,7 @@ export class OrderService {
         const updatedOrder = await this.orderRepository.updateStatus(id, data.status);
 
         if (!updatedOrder) {
-            throw new NotFoundError('Order', id);
+            throw new OrderNotFoundError(id);
         }
 
         return updatedOrder;
@@ -103,7 +104,7 @@ export class OrderService {
         const order = await this.orderRepository.findById(id);
 
         if (!order) {
-            throw new NotFoundError('Order', id);
+            throw new OrderNotFoundError(id);
         }
 
         // Business logic: Only pending orders can be deleted

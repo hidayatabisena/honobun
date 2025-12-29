@@ -1,5 +1,5 @@
 import type { Context, ErrorHandler } from 'hono';
-import { AppError } from '../types/error.types';
+import { AppError } from '@/core/errors/base/app-error';
 import { errorResponse } from '../types/api.types';
 import { env } from '@/config/env';
 

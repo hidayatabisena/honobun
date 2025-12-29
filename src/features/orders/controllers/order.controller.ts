@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
-import type { OrderService } from './order.service';
-import { successResponse, paginatedResponse } from '@/modules/shared/types/api.types';
-import type { CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from './order.types';
+import type { OrderService } from '../services/order.service';
+import { successResponse, paginatedResponse } from '@/shared/types/api.types';
+import type { CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from '../types/order.types';
 
 /**
  * Order Controller

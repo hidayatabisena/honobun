@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { onErrorHandler } from '@/modules/shared/middleware/errorHandler';
-import { successResponse } from '@/modules/shared/types/api.types';
+import { onErrorHandler } from '@/shared/middleware/errorHandler';
+import { successResponse } from '@/shared/types/api.types';
 
 /**
  * Creates and configures the Hono application

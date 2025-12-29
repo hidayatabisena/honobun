@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
-import type { OrderController } from './order.controller';
-import { validateBody, validateParams, validateQuery } from '@/modules/shared/middleware/validator';
+import type { OrderController } from '../controllers/order.controller';
+import { validateBody, validateParams, validateQuery } from '@/shared/middleware/validator';
 import {
     createOrderSchema,
     updateOrderStatusSchema,
     orderIdParamSchema,
     listOrdersQuerySchema,
-} from './order.types';
+} from '../types/order.types';
 
 /**
  * Creates order routes with injected controller

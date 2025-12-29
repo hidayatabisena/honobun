@@ -1,6 +1,6 @@
 import type { Context, Next } from 'hono';
 import type { ZodSchema } from 'zod';
-import { ValidationError } from '../types/error.types';
+import { ValidationError } from '@/core/errors/base/validation-error';
 
 /**
  * Request validation middleware factory

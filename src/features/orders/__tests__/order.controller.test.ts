@@ -1,13 +1,13 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { Hono } from 'hono';
-import { OrderController } from '../order.controller';
-import type { OrderService } from '../order.service';
-import type { Order } from '../order.types';
-import { validateBody, validateParams, validateQuery } from '@/modules/shared/middleware/validator';
-import { createOrderSchema, orderIdParamSchema, listOrdersQuerySchema } from '../order.types';
-import { onErrorHandler } from '@/modules/shared/middleware/errorHandler';
-import { NotFoundError } from '@/modules/shared/types/error.types';
-import type { ApiResponse } from '@/modules/shared/types/api.types';
+import { OrderController } from '../controllers/order.controller';
+import type { OrderService } from '../services/order.service';
+import type { Order } from '../types/order.types';
+import { validateBody, validateParams, validateQuery } from '@/shared/middleware/validator';
+import { createOrderSchema, orderIdParamSchema, listOrdersQuerySchema } from '../types/order.types';
+import { onErrorHandler } from '@/shared/middleware/errorHandler';
+import { OrderNotFoundError } from '../errors/order-errors';
+import type { ApiResponse } from '@/shared/types/api.types';
 
 /**
  * Controller integration tests
@@ -90,7 +90,7 @@ describe('OrderController', () => {
 
         it('should return 404 when order not found', async () => {
             (mockService.getOrderById as any).mockRejectedValue(
-                new NotFoundError('Order', 'non-existent')
+                new OrderNotFoundError('non-existent')
             );
 
             const res = await app.request('/orders/123e4567-e89b-12d3-a456-426614174999');

@@ -1,8 +1,9 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
-import { OrderService } from '../order.service';
-import type { OrderRepository } from '../order.repository';
-import type { Order, CreateOrderDto } from '../order.types';
-import { NotFoundError, ValidationError } from '@/modules/shared/types/error.types';
+import { OrderService } from '../services/order.service';
+import type { OrderRepository } from '../repositories/order.repository';
+import type { Order, CreateOrderDto } from '../types/order.types';
+import { ValidationError } from '@/core/errors/base/validation-error';
+import { OrderNotFoundError } from '../errors/order-errors';
 
 /**
  * Unit tests for OrderService
@@ -53,7 +54,7 @@ describe('OrderService', () => {
         it('should throw NotFoundError when order does not exist', async () => {
             (mockRepo.findById as any).mockResolvedValue(null);
 
-            await expect(service.getOrderById('non-existent-id')).rejects.toThrow(NotFoundError);
+            await expect(service.getOrderById('non-existent-id')).rejects.toThrow(OrderNotFoundError);
         });
     });
 
@@ -119,7 +120,7 @@ describe('OrderService', () => {
 
             await expect(
                 service.updateOrderStatus('non-existent', { status: 'confirmed' })
-            ).rejects.toThrow(NotFoundError);
+            ).rejects.toThrow(OrderNotFoundError);
         });
     });
 
