@@ -1,24 +1,18 @@
 /**
  * Base application error class
+ * All custom errors should extend this class
+ * 
+ * @abstract - This class should not be instantiated directly
  */
-export class AppError extends Error {
-    public readonly code: string;
-    public readonly statusCode: number;
-    public readonly details?: unknown;
-
+export abstract class AppError extends Error {
     constructor(
+        public readonly code: string,
         message: string,
-        code: string = 'INTERNAL_ERROR',
-        statusCode: number = 500,
-        details?: unknown
+        public readonly statusCode: number,
+        public readonly details?: unknown
     ) {
         super(message);
-        this.name = 'AppError';
-        this.code = code;
-        this.statusCode = statusCode;
-        this.details = details;
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-        }
+        this.name = this.constructor.name;
+        Error.captureStackTrace(this, this.constructor);
     }
 }

@@ -8,7 +8,6 @@ export class NotFoundError extends AppError {
         const message = identifier
             ? `${resource} with id '${identifier}' not found`
             : `${resource} not found`;
-        super(message, 'NOT_FOUND', 404);
-        this.name = 'NotFoundError';
+        super('NOT_FOUND', message, 404);
     }
 }
