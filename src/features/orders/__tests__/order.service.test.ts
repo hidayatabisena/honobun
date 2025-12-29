@@ -21,12 +21,22 @@ const mockOrder: Order = {
     updatedAt: new Date(),
 };
 
+const mockOrderRow = {
+    id: mockOrder.id,
+    user_id: mockOrder.userId,
+    status: mockOrder.status,
+    total: mockOrder.total,
+    items: mockOrder.items,
+    created_at: mockOrder.createdAt,
+    updated_at: mockOrder.updatedAt,
+};
+
 // Create mock repository
 function createMockRepository(): OrderRepository {
     return {
         findById: mock(() => Promise.resolve(null)),
         findMany: mock(() => Promise.resolve({ orders: [], total: 0 })),
-        create: mock(() => Promise.resolve(mockOrder)),
+        create: mock(() => Promise.resolve(mockOrderRow)),
         updateStatus: mock(() => Promise.resolve(null)),
         delete: mock(() => Promise.resolve(false)),
     } as unknown as OrderRepository;
@@ -43,7 +53,7 @@ describe('OrderService', () => {
 
     describe('getOrderById', () => {
         it('should return order when found', async () => {
-            (mockRepo.findById as any).mockResolvedValue(mockOrder);
+            (mockRepo.findById as any).mockResolvedValue(mockOrderRow);
 
             const result = await service.getOrderById(mockOrder.id);
 
@@ -99,8 +109,9 @@ describe('OrderService', () => {
     describe('updateOrderStatus', () => {
         it('should allow valid status transitions', async () => {
             const pendingOrder = { ...mockOrder, status: 'pending' as const };
-            (mockRepo.findById as any).mockResolvedValue(pendingOrder);
-            (mockRepo.updateStatus as any).mockResolvedValue({ ...pendingOrder, status: 'confirmed' });
+            const pendingOrderRow = { ...mockOrderRow, status: pendingOrder.status };
+            (mockRepo.findById as any).mockResolvedValue(pendingOrderRow);
+            (mockRepo.updateStatus as any).mockResolvedValue({ ...pendingOrderRow, status: 'confirmed' });
 
             const result = await service.updateOrderStatus(mockOrder.id, { status: 'confirmed' });
 
@@ -109,7 +120,7 @@ describe('OrderService', () => {
 
         it('should reject invalid status transitions', async () => {
             const deliveredOrder = { ...mockOrder, status: 'delivered' as const };
-            (mockRepo.findById as any).mockResolvedValue(deliveredOrder);
+            (mockRepo.findById as any).mockResolvedValue({ ...mockOrderRow, status: deliveredOrder.status });
 
             await expect(
                 service.updateOrderStatus(mockOrder.id, { status: 'pending' })
@@ -128,7 +139,7 @@ describe('OrderService', () => {
     describe('deleteOrder', () => {
         it('should allow deleting pending orders', async () => {
             const pendingOrder = { ...mockOrder, status: 'pending' as const };
-            (mockRepo.findById as any).mockResolvedValue(pendingOrder);
+            (mockRepo.findById as any).mockResolvedValue({ ...mockOrderRow, status: pendingOrder.status });
             (mockRepo.delete as any).mockResolvedValue(true);
 
             // Should resolve without throwing
@@ -138,7 +149,7 @@ describe('OrderService', () => {
 
         it('should reject deleting non-pending orders', async () => {
             const shippedOrder = { ...mockOrder, status: 'shipped' as const };
-            (mockRepo.findById as any).mockResolvedValue(shippedOrder);
+            (mockRepo.findById as any).mockResolvedValue({ ...mockOrderRow, status: shippedOrder.status });
 
             await expect(service.deleteOrder(mockOrder.id)).rejects.toThrow(ValidationError);
         });

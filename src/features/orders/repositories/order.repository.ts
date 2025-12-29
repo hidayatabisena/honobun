@@ -1,5 +1,15 @@
 import type { TransactionSql } from '@/infrastructure/database/client';
-import type { Order, CreateOrderDto, OrderStatus } from '../types/order.types';
+import type { CreateOrderDto, OrderStatus } from '../types/order.types';
+
+export interface OrderRow {
+  id: string;
+  user_id: string;
+  status: OrderStatus;
+  total: number;
+  items: unknown;
+  created_at: Date;
+  updated_at: Date;
+}
 
 /**
  * Order Repository
@@ -8,16 +18,16 @@ import type { Order, CreateOrderDto, OrderStatus } from '../types/order.types';
 export class OrderRepository {
   constructor(private readonly db: TransactionSql) { }
 
-  async findById(id: string): Promise<Order | null> {
-    const [order] = await this.db<Order[]>`
+  async findById(id: string): Promise<OrderRow | null> {
+    const [order] = await this.db<OrderRow[]>`
       SELECT 
         id,
-        user_id as "userId",
+        user_id,
         status,
         total,
         items,
-        created_at as "createdAt",
-        updated_at as "updatedAt"
+        created_at,
+        updated_at
       FROM orders 
       WHERE id = ${id}
     `;
@@ -29,7 +39,7 @@ export class OrderRepository {
     limit: number;
     userId?: string;
     status?: OrderStatus;
-  }): Promise<{ orders: Order[]; total: number }> {
+  }): Promise<{ orders: OrderRow[]; total: number }> {
     const { page, limit, userId, status } = options;
     const offset = (page - 1) * limit;
 
@@ -40,15 +50,15 @@ export class OrderRepository {
       ${status ? this.db`AND status = ${status}` : this.db``}
     `;
 
-    const orders = await this.db<Order[]>`
+    const orders = await this.db<OrderRow[]>`
       SELECT 
         id,
-        user_id as "userId",
+        user_id,
         status,
         total,
         items,
-        created_at as "createdAt",
-        updated_at as "updatedAt"
+        created_at,
+        updated_at
       FROM orders 
       ${whereClause}
       ORDER BY created_at DESC
@@ -62,8 +72,8 @@ export class OrderRepository {
     return { orders, total: parseInt(count, 10) };
   }
 
-  async create(data: CreateOrderDto, total: number, status: OrderStatus): Promise<Order> {
-    const [order] = await this.db<Order[]>`
+  async create(data: CreateOrderDto, total: number, status: OrderStatus): Promise<OrderRow> {
+    const [order] = await this.db<OrderRow[]>`
       INSERT INTO orders (user_id, status, total, items)
       VALUES (
         ${data.userId},
@@ -73,29 +83,29 @@ export class OrderRepository {
       )
       RETURNING 
         id,
-        user_id as "userId",
+        user_id,
         status,
         total,
         items,
-        created_at as "createdAt",
-        updated_at as "updatedAt"
+        created_at,
+        updated_at
     `;
     return order;
   }
 
-  async updateStatus(id: string, status: OrderStatus): Promise<Order | null> {
-    const [order] = await this.db<Order[]>`
+  async updateStatus(id: string, status: OrderStatus): Promise<OrderRow | null> {
+    const [order] = await this.db<OrderRow[]>`
       UPDATE orders 
       SET status = ${status}, updated_at = NOW()
       WHERE id = ${id}
       RETURNING 
         id,
-        user_id as "userId",
+        user_id,
         status,
         total,
         items,
-        created_at as "createdAt",
-        updated_at as "updatedAt"
+        created_at,
+        updated_at
     `;
     return order ?? null;
   }

@@ -1,7 +1,19 @@
-import { OrderRepository } from '../repositories/order.repository';
+import { OrderRepository, type OrderRow } from '../repositories/order.repository';
 import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery, OrderStatus } from '../types/order.types';
 import { ValidationError } from '../../../core/errors/base/validation-error';
 import { OrderNotFoundError } from '../errors/order-errors';
+
+function toOrder(row: OrderRow): Order {
+    return {
+        id: row.id,
+        userId: row.user_id,
+        status: row.status,
+        total: row.total,
+        items: row.items as any,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at,
+    };
+}
 
 /**
  * Order Service
@@ -11,13 +23,13 @@ export class OrderService {
     constructor(private readonly orderRepository: OrderRepository) { }
 
     async getOrderById(id: string): Promise<Order> {
-        const order = await this.orderRepository.findById(id);
+        const orderRow = await this.orderRepository.findById(id);
 
-        if (!order) {
+        if (!orderRow) {
             throw new OrderNotFoundError(id);
         }
 
-        return order;
+        return toOrder(orderRow);
     }
 
     async listOrders(query: ListOrdersQuery): Promise<{
@@ -26,7 +38,7 @@ export class OrderService {
         limit: number;
         total: number;
     }> {
-        const { orders, total } = await this.orderRepository.findMany({
+        const { orders: orderRows, total } = await this.orderRepository.findMany({
             page: query.page,
             limit: query.limit,
             userId: query.userId,
@@ -34,7 +46,7 @@ export class OrderService {
         });
 
         return {
-            orders,
+            orders: orderRows.map(toOrder),
             page: query.page,
             limit: query.limit,
             total,
@@ -61,7 +73,8 @@ export class OrderService {
             throw new ValidationError('Maximum 100 items per order');
         }
 
-        return this.orderRepository.create(data, total, initialStatus);
+        const createdRow = await this.orderRepository.create(data, total, initialStatus);
+        return toOrder(createdRow);
     }
 
     async updateOrderStatus(id: string, data: UpdateOrderStatusDto): Promise<Order> {
@@ -95,7 +108,7 @@ export class OrderService {
             throw new OrderNotFoundError(id);
         }
 
-        return updatedOrder;
+        return toOrder(updatedOrder);
     }
 
     async cancelOrder(id: string): Promise<Order> {
