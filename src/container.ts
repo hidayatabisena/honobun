@@ -1,8 +1,8 @@
 import { db } from '@/infrastructure/database/client';
-import { OrderRepository } from '@/modules/orders/order.repository';
-import { OrderService } from '@/modules/orders/order.service';
-import { OrderController } from '@/modules/orders/order.controller';
-import { createOrderRoutes } from '@/modules/orders/order.routes';
+import { OrderRepository } from '@/features/orders/order.repository';
+import { OrderService } from '@/features/orders/order.service';
+import { OrderController } from '@/features/orders/order.controller';
+import { createOrderRoutes } from '@/features/orders/order.routes';
 import type { Hono } from 'hono';
 
 /**
