@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
 import type { OrderService } from '../services/order.service';
 import { successResponse, paginatedResponse } from '@/shared/types/api.types';
-import type { CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from '../types/order.types';
+import { ValidationError } from '@/core/errors/base/validation-error';
 
 /**
  * Order Controller
@@ -11,13 +11,13 @@ export class OrderController {
     constructor(private readonly orderService: OrderService) { }
 
     async getOrder(c: Context): Promise<Response> {
-        const { id } = c.get('validatedParams');
-        const order = await this.orderService.getOrderById(id);
+        const id = c.req.param('id');
+        const order = await this.orderService.getOrderById({ id });
         return c.json(successResponse(order));
     }
 
     async listOrders(c: Context): Promise<Response> {
-        const query: ListOrdersQuery = c.get('validatedQuery');
+        const query = c.req.query();
         const result = await this.orderService.listOrders(query);
 
         return c.json(
@@ -31,27 +31,40 @@ export class OrderController {
     }
 
     async createOrder(c: Context): Promise<Response> {
-        const data: CreateOrderDto = c.get('validatedBody');
-        const order = await this.orderService.createOrder(data);
+        let body: unknown;
+        try {
+            body = await c.req.json();
+        } catch {
+            throw new ValidationError('Invalid JSON body');
+        }
+
+        const order = await this.orderService.createOrder(body);
         return c.json(successResponse(order), 201);
     }
 
     async updateOrderStatus(c: Context): Promise<Response> {
-        const { id } = c.get('validatedParams');
-        const data: UpdateOrderStatusDto = c.get('validatedBody');
-        const order = await this.orderService.updateOrderStatus(id, data);
+        const id = c.req.param('id');
+
+        let body: unknown;
+        try {
+            body = await c.req.json();
+        } catch {
+            throw new ValidationError('Invalid JSON body');
+        }
+
+        const order = await this.orderService.updateOrderStatus({ id }, body);
         return c.json(successResponse(order));
     }
 
     async cancelOrder(c: Context): Promise<Response> {
-        const { id } = c.get('validatedParams');
-        const order = await this.orderService.cancelOrder(id);
+        const id = c.req.param('id');
+        const order = await this.orderService.cancelOrder({ id });
         return c.json(successResponse(order));
     }
 
     async deleteOrder(c: Context): Promise<Response> {
-        const { id } = c.get('validatedParams');
-        await this.orderService.deleteOrder(id);
+        const id = c.req.param('id');
+        await this.orderService.deleteOrder({ id });
         return c.json(successResponse({ deleted: true }));
     }
 }

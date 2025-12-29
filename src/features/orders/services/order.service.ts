@@ -1,5 +1,6 @@
 import { OrderRepository, type OrderRow } from '../repositories/order.repository';
 import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery, OrderStatus } from '../types/order.types';
+import { createOrderSchema, updateOrderStatusSchema, orderIdParamSchema, listOrdersQuerySchema } from '../types/order.types';
 import { ValidationError } from '../../../core/errors/base/validation-error';
 import { OrderNotFoundError } from '../errors/order-errors';
 
@@ -22,7 +23,8 @@ function toOrder(row: OrderRow): Order {
 export class OrderService {
     constructor(private readonly orderRepository: OrderRepository) { }
 
-    async getOrderById(id: string): Promise<Order> {
+    async getOrderById(params: unknown): Promise<Order> {
+        const { id } = orderIdParamSchema.parse(params);
         const orderRow = await this.orderRepository.findById(id);
 
         if (!orderRow) {
@@ -32,28 +34,30 @@ export class OrderService {
         return toOrder(orderRow);
     }
 
-    async listOrders(query: ListOrdersQuery): Promise<{
+    async listOrders(query: unknown): Promise<{
         orders: Order[];
         page: number;
         limit: number;
         total: number;
     }> {
+        const parsedQuery: ListOrdersQuery = listOrdersQuerySchema.parse(query);
         const { orders: orderRows, total } = await this.orderRepository.findMany({
-            page: query.page,
-            limit: query.limit,
-            userId: query.userId,
-            status: query.status,
+            page: parsedQuery.page,
+            limit: parsedQuery.limit,
+            userId: parsedQuery.userId,
+            status: parsedQuery.status,
         });
 
         return {
             orders: orderRows.map(toOrder),
-            page: query.page,
-            limit: query.limit,
+            page: parsedQuery.page,
+            limit: parsedQuery.limit,
             total,
         };
     }
 
-    async createOrder(data: CreateOrderDto): Promise<Order> {
+    async createOrder(body: unknown): Promise<Order> {
+        const data: CreateOrderDto = createOrderSchema.parse(body);
         // Business logic: Calculate total from items
         const total = data.items.reduce(
             (sum, item) => sum + item.price * item.quantity,
@@ -77,7 +81,9 @@ export class OrderService {
         return toOrder(createdRow);
     }
 
-    async updateOrderStatus(id: string, data: UpdateOrderStatusDto): Promise<Order> {
+    async updateOrderStatus(params: unknown, body: unknown): Promise<Order> {
+        const { id } = orderIdParamSchema.parse(params);
+        const data: UpdateOrderStatusDto = updateOrderStatusSchema.parse(body);
         // Business logic: Get current order to validate transition
         const currentOrder = await this.orderRepository.findById(id);
 
@@ -111,11 +117,13 @@ export class OrderService {
         return toOrder(updatedOrder);
     }
 
-    async cancelOrder(id: string): Promise<Order> {
-        return this.updateOrderStatus(id, { status: 'cancelled' });
+    async cancelOrder(params: unknown): Promise<Order> {
+        const { id } = orderIdParamSchema.parse(params);
+        return this.updateOrderStatus({ id }, { status: 'cancelled' });
     }
 
-    async deleteOrder(id: string): Promise<void> {
+    async deleteOrder(params: unknown): Promise<void> {
+        const { id } = orderIdParamSchema.parse(params);
         const order = await this.orderRepository.findById(id);
 
         if (!order) {

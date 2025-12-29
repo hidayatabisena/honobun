@@ -55,7 +55,7 @@ describe('OrderService', () => {
         it('should return order when found', async () => {
             (mockRepo.findById as any).mockResolvedValue(mockOrderRow);
 
-            const result = await service.getOrderById(mockOrder.id);
+            const result = await service.getOrderById({ id: mockOrder.id });
 
             expect(result).toEqual(mockOrder);
             expect(mockRepo.findById).toHaveBeenCalledWith(mockOrder.id);
@@ -64,7 +64,13 @@ describe('OrderService', () => {
         it('should throw NotFoundError when order does not exist', async () => {
             (mockRepo.findById as any).mockResolvedValue(null);
 
-            await expect(service.getOrderById('non-existent-id')).rejects.toThrow(OrderNotFoundError);
+            await expect(
+                service.getOrderById({ id: '123e4567-e89b-12d3-a456-426614174999' })
+            ).rejects.toThrow(OrderNotFoundError);
+        });
+
+        it('should throw for invalid UUID', async () => {
+            await expect(service.getOrderById({ id: 'invalid-uuid' })).rejects.toThrow();
         });
     });
 
@@ -113,7 +119,7 @@ describe('OrderService', () => {
             (mockRepo.findById as any).mockResolvedValue(pendingOrderRow);
             (mockRepo.updateStatus as any).mockResolvedValue({ ...pendingOrderRow, status: 'confirmed' });
 
-            const result = await service.updateOrderStatus(mockOrder.id, { status: 'confirmed' });
+            const result = await service.updateOrderStatus({ id: mockOrder.id }, { status: 'confirmed' });
 
             expect(result.status).toBe('confirmed');
         });
@@ -123,7 +129,7 @@ describe('OrderService', () => {
             (mockRepo.findById as any).mockResolvedValue({ ...mockOrderRow, status: deliveredOrder.status });
 
             await expect(
-                service.updateOrderStatus(mockOrder.id, { status: 'pending' })
+                service.updateOrderStatus({ id: mockOrder.id }, { status: 'pending' })
             ).rejects.toThrow(ValidationError);
         });
 
@@ -131,7 +137,10 @@ describe('OrderService', () => {
             (mockRepo.findById as any).mockResolvedValue(null);
 
             await expect(
-                service.updateOrderStatus('non-existent', { status: 'confirmed' })
+                service.updateOrderStatus(
+                    { id: '123e4567-e89b-12d3-a456-426614174999' },
+                    { status: 'confirmed' }
+                )
             ).rejects.toThrow(OrderNotFoundError);
         });
     });
@@ -143,7 +152,7 @@ describe('OrderService', () => {
             (mockRepo.delete as any).mockResolvedValue(true);
 
             // Should resolve without throwing
-            await service.deleteOrder(mockOrder.id);
+            await service.deleteOrder({ id: mockOrder.id });
             expect(mockRepo.delete).toHaveBeenCalledWith(mockOrder.id);
         });
 
@@ -151,7 +160,7 @@ describe('OrderService', () => {
             const shippedOrder = { ...mockOrder, status: 'shipped' as const };
             (mockRepo.findById as any).mockResolvedValue({ ...mockOrderRow, status: shippedOrder.status });
 
-            await expect(service.deleteOrder(mockOrder.id)).rejects.toThrow(ValidationError);
+            await expect(service.deleteOrder({ id: mockOrder.id })).rejects.toThrow(ValidationError);
         });
     });
 });
