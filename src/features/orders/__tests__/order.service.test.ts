@@ -74,6 +74,7 @@ describe('OrderService', () => {
             const callArgs = (mockRepo.create as any).mock.calls[0];
             expect(callArgs[0]).toEqual(createOrderDto);
             expect(callArgs[1]).toBeCloseTo(99.99, 2); // 2*25 + 1*49.99
+            expect(callArgs[2]).toBe('pending');
         });
 
         it('should reject orders with total less than $1', async () => {

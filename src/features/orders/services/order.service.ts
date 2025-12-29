@@ -1,5 +1,5 @@
 import { OrderRepository } from '../repositories/order.repository';
-import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery } from '../types/order.types';
+import type { Order, CreateOrderDto, UpdateOrderStatusDto, ListOrdersQuery, OrderStatus } from '../types/order.types';
 import { ValidationError } from '../../../core/errors/base/validation-error';
 import { OrderNotFoundError } from '../errors/order-errors';
 
@@ -48,6 +48,8 @@ export class OrderService {
             0
         );
 
+        const initialStatus: OrderStatus = 'pending';
+
         // Business logic: Validate minimum order value
         if (total < 1) {
             throw new ValidationError('Order total must be at least $1');
@@ -59,7 +61,7 @@ export class OrderService {
             throw new ValidationError('Maximum 100 items per order');
         }
 
-        return this.orderRepository.create(data, total);
+        return this.orderRepository.create(data, total, initialStatus);
     }
 
     async updateOrderStatus(id: string, data: UpdateOrderStatusDto): Promise<Order> {

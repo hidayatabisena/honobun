@@ -62,12 +62,12 @@ export class OrderRepository {
     return { orders, total: parseInt(count, 10) };
   }
 
-  async create(data: CreateOrderDto, total: number): Promise<Order> {
+  async create(data: CreateOrderDto, total: number, status: OrderStatus): Promise<Order> {
     const [order] = await this.db<Order[]>`
       INSERT INTO orders (user_id, status, total, items)
       VALUES (
         ${data.userId},
-        'pending',
+        ${status},
         ${total},
         ${JSON.stringify(data.items)}
       )
