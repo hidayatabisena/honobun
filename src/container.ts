@@ -1,5 +1,6 @@
 import { db } from '@/infrastructure/database/client';
 import { createOrdersContainer, type OrdersContainer } from '@/features/orders/container';
+import { createWidgetsContainer, type WidgetsContainer } from '@/features/widgets/container';
 
 /**
  * Application Dependency Container
@@ -15,6 +16,7 @@ import { createOrdersContainer, type OrdersContainer } from '@/features/orders/c
 export interface Container {
     // Feature containers
     orders: OrdersContainer;
+    widgets: WidgetsContainer;
 
     // Add more feature containers here as the app grows
     // users?: UsersContainer;
@@ -28,6 +30,7 @@ export interface Container {
 export function createContainer(): Container {
     // Create feature-specific containers
     const orders = createOrdersContainer({ db });
+    const widgets = createWidgetsContainer({ db });
 
     // Add more feature containers as needed
     // const users = createUsersContainer();
@@ -35,6 +38,7 @@ export function createContainer(): Container {
 
     return {
         orders,
+        widgets,
         // Add more feature containers here
         // users,
         // products,

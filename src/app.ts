@@ -11,6 +11,7 @@ export function createApp() {
 
     // Register module routes
     app.route('/api/orders', container.orders.orderRoutes);
+    app.route('/api/widgets', container.widgets.widgetRoutes);
 
     // Add more module routes here:
     // app.route('/api/users', container.userRoutes);
