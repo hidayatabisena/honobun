@@ -1,51 +1,43 @@
-import { db } from '@/infrastructure/database/client';
-import { OrderRepository } from '@/features/orders/repositories/order.repository';
-import { OrderService } from '@/features/orders/services/order.service';
-import { OrderController } from '@/features/orders/controllers/order.controller';
-import { createOrderRoutes } from '@/features/orders/routes/order.routes';
+import { createOrdersContainer, type OrdersContainer } from '@/features/orders/container';
 import type { Hono } from 'hono';
 
 /**
- * Dependency Container
- * Manual DI - wires all dependencies at application startup
+ * Application Dependency Container
+ * Manual DI - wires all feature containers at application startup
  * TypeScript enforces boundaries (can't access what's not injected)
+ * 
+ * As the application grows, add feature-specific containers here
+ * Example:
+ * - orders: OrdersContainer
+ * - users: UsersContainer
+ * - products: ProductsContainer
  */
 export interface Container {
-    // Repositories
-    orderRepository: OrderRepository;
+    // Feature containers
+    orders: OrdersContainer;
 
-    // Services
-    orderService: OrderService;
-
-    // Controllers
-    orderController: OrderController;
-
-    // Routes
-    orderRoutes: Hono;
+    // Add more feature containers here as the app grows
+    // users?: UsersContainer;
+    // products?: ProductsContainer;
 }
 
 /**
- * Creates the dependency container
- * All dependencies are wired here in a single place
+ * Creates the application dependency container
+ * Delegates to feature-specific containers for clean separation
  */
 export function createContainer(): Container {
-    // Layer 1: Repositories (database access)
-    const orderRepository = new OrderRepository(db);
+    // Create feature-specific containers
+    const orders = createOrdersContainer();
 
-    // Layer 2: Services (business logic)
-    const orderService = new OrderService(orderRepository);
-
-    // Layer 3: Controllers (HTTP handling)
-    const orderController = new OrderController(orderService);
-
-    // Routes (connect controllers to HTTP endpoints)
-    const orderRoutes = createOrderRoutes(orderController);
+    // Add more feature containers as needed
+    // const users = createUsersContainer();
+    // const products = createProductsContainer();
 
     return {
-        orderRepository,
-        orderService,
-        orderController,
-        orderRoutes,
+        orders,
+        // Add more feature containers here
+        // users,
+        // products,
     };
 }
 

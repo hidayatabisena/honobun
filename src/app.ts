@@ -10,7 +10,7 @@ export function createApp() {
     const container = createContainer();
 
     // Register module routes
-    app.route('/api/orders', container.orderRoutes);
+    app.route('/api/orders', container.orders.orderRoutes);
 
     // Add more module routes here:
     // app.route('/api/users', container.userRoutes);
