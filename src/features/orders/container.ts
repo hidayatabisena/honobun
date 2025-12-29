@@ -1,4 +1,4 @@
-import { db } from '@/infrastructure/database/client';
+import type { TransactionSql } from '@/infrastructure/database/client';
 import { OrderRepository } from './repositories/order.repository';
 import { OrderService } from './services/order.service';
 import { OrderController } from './controllers/order.controller';
@@ -23,13 +23,17 @@ export interface OrdersContainer {
     orderRoutes: Hono;
 }
 
+export interface OrdersInfrastructureDeps {
+    db: TransactionSql;
+}
+
 /**
  * Creates the orders feature container
  * All order-related dependencies are wired here
  */
-export function createOrdersContainer(): OrdersContainer {
+export function createOrdersContainer(deps: OrdersInfrastructureDeps): OrdersContainer {
     // Layer 1: Repositories (database access)
-    const orderRepository = new OrderRepository(db);
+    const orderRepository = new OrderRepository(deps.db);
 
     // Layer 2: Services (business logic)
     const orderService = new OrderService(orderRepository);
@@ -58,8 +62,9 @@ export type OrdersContainerOverrides = Partial<OrdersContainer>;
  * Useful for injecting mocks in tests
  */
 export function createTestOrdersContainer(
+    deps: OrdersInfrastructureDeps,
     overrides: OrdersContainerOverrides = {}
 ): OrdersContainer {
-    const container = createOrdersContainer();
+    const container = createOrdersContainer(deps);
     return { ...container, ...overrides };
 }

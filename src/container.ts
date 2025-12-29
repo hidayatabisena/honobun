@@ -1,5 +1,5 @@
+import { db } from '@/infrastructure/database/client';
 import { createOrdersContainer, type OrdersContainer } from '@/features/orders/container';
-import type { Hono } from 'hono';
 
 /**
  * Application Dependency Container
@@ -27,7 +27,7 @@ export interface Container {
  */
 export function createContainer(): Container {
     // Create feature-specific containers
-    const orders = createOrdersContainer();
+    const orders = createOrdersContainer({ db });
 
     // Add more feature containers as needed
     // const users = createUsersContainer();
