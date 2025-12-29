@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
 import { onErrorHandler } from '@/shared/middleware/errorHandler';
+import { requestLogger } from '@/shared/middleware/requestLogger';
 import { successResponse } from '@/shared/types/api.types';
 
 /**
@@ -11,7 +11,7 @@ export function createServer() {
     const app = new Hono();
 
     // Global middleware
-    app.use('*', logger());
+    app.use('*', requestLogger());
     app.use('*', cors());
 
     // Global error handler
