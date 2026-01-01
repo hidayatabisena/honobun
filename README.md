@@ -1,10 +1,11 @@
-# Honobun
+# Honobun Backend Style Guide
+
+Honobun Style Guide — created by [Han Sena](https://hidayatabisena.com)
 
 A production-ready backend service built with **Bun**, **Hono**, **PostgreSQL**, and **TypeScript**.
 
-This repository uses a strict **Layered Architecture** with **Manual Dependency Injection**. This README acts as the Honobun style guide, inspired by opinionated guides like Airbnb’s.
+This repository uses a strict **Layered Architecture** with **Manual Dependency Injection**. This README acts as the Hono Backend Style Guide, inspired by opinionated guides like Airbnb’s.
 
-Honobun Style Guide — created by [Han Sena](https://hidayatabisena.com)
 
 ## Table of Contents
 
