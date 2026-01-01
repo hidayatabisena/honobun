@@ -78,14 +78,14 @@ src/
 - Declare endpoints and delegate to controller methods
 - No business logic, no validation logic
 
-Example: [order.routes.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/routes/order.routes.ts)
+Example: [order.routes.ts](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/routes/order.routes.ts)
 
 ### Controllers
 
 - HTTP concerns only: read params/query/body, call service, format response
 - Use shared helpers for JSON parsing
 
-Example: [order.controller.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/controllers/order.controller.ts)
+Example: [order.controller.ts](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/controllers/order.controller.ts)
 
 ### Services
 
@@ -93,14 +93,14 @@ Example: [order.controller.ts](file:///Users/hansena/Documents/Aktiva/honobun/sr
 - Validate input using Zod schemas from `types/`
 - Convert repository rows to API/domain shapes
 
-Example: [order.service.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/services/order.service.ts)
+Example: [order.service.ts](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/services/order.service.ts)
 
 ### Repositories
 
 - Database access only (SQL)
 - No business rules, no HTTP logic
 
-Example: [order.repository.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/repositories/order.repository.ts)
+Example: [order.repository.ts](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/repositories/order.repository.ts)
 
 ## Manual Dependency Injection
 
@@ -128,7 +128,7 @@ export function createContainer() {
 - A feature container wires repository → service → controller → routes
 - Feature containers accept infrastructure deps (e.g. `{ db }`) as parameters
 
-Example: [orders/container.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/container.ts)
+Example: [orders/container.ts](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/container.ts)
 
 ## Validation & Errors
 
@@ -138,9 +138,9 @@ Example: [orders/container.ts](file:///Users/hansena/Documents/Aktiva/honobun/sr
 - The global error handler is registered at server creation
 
 References:
-- Global server + error handler: [server.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/infrastructure/http/server.ts)
-- JSON body parsing helper: [parseJsonBody.ts](file:///Users/hansena/Documents/Aktiva/honobun/src/shared/http/parseJsonBody.ts)
-- Error system overview: [core/errors/README.md](file:///Users/hansena/Documents/Aktiva/honobun/src/core/errors/README.md)
+- Global server + error handler: [server.ts](https://github.com/hidayatabisena/honobun/blob/main/src/infrastructure/http/server.ts)
+- JSON body parsing helper: [parseJsonBody.ts](https://github.com/hidayatabisena/honobun/blob/main/src/shared/http/parseJsonBody.ts)
+- Error system overview: [core/errors/README.md](https://github.com/hidayatabisena/honobun/blob/main/src/core/errors/README.md)
 
 ## Testing
 
@@ -156,8 +156,8 @@ bun run typecheck
 ```
 
 Examples:
-- Orders tests: [orders/__tests__](file:///Users/hansena/Documents/Aktiva/honobun/src/features/orders/__tests__)
-- Widgets tests: [widgets/__tests__](file:///Users/hansena/Documents/Aktiva/honobun/src/features/widgets/__tests__)
+- Orders tests: [orders/__tests__](https://github.com/hidayatabisena/honobun/blob/main/src/features/orders/__tests__)
+- Widgets tests: [widgets/__tests__](https://github.com/hidayatabisena/honobun/blob/main/src/features/widgets/__tests__)
 
 ## Migrations & Runtime
 
